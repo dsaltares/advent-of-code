@@ -12,6 +12,10 @@ type Position = {
   depth: number;
 };
 
+type PositionWithAim = Position & {
+  aim: number;
+};
+
 const getCommands = (): Command[] =>
   readFileSync('./data/day02.txt', 'utf8')
     .split('\n')
@@ -40,9 +44,36 @@ const applyCommand = (position: Position, command: Command) => {
 export const getPositionAfterCommands = (commands: Command[]) =>
   commands.reduce(applyCommand, { horizontal: 0, depth: 0 } as Position);
 
+const applyCommandWithAim = (position: PositionWithAim, command: Command) => {
+  const newPosition: PositionWithAim = { ...position };
+  if (command.direction === 'forward') {
+    newPosition.horizontal += command.amount;
+    newPosition.depth += newPosition.aim * command.amount;
+  } else if (command.direction === 'down') {
+    newPosition.aim += command.amount;
+  } else if (command.direction === 'up') {
+    newPosition.aim -= command.amount;
+  }
+
+  return newPosition;
+};
+
+export const getPositionWithAimAfterCommands = (commands: Command[]) =>
+  commands.reduce(applyCommandWithAim, {
+    horizontal: 0,
+    depth: 0,
+    aim: 0,
+  } as PositionWithAim);
+
 const day02 = () => {
   const commands = getCommands();
   const position = getPositionAfterCommands(commands);
+  return position.horizontal * position.depth;
+};
+
+export const day02PartTwo = () => {
+  const commands = getCommands();
+  const position = getPositionWithAimAfterCommands(commands);
   return position.horizontal * position.depth;
 };
 

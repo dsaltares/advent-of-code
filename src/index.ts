@@ -1,7 +1,7 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import day01, { day01PartTwo } from './day01';
-import day02 from './day02';
+import day02, { day02PartTwo } from './day02';
 
 type Day = {
   main: () => void;
@@ -15,6 +15,7 @@ const days: Day[] = [
   },
   {
     main: day02,
+    partTwo: day02PartTwo,
   },
 ];
 
