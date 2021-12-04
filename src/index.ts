@@ -1,24 +1,49 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
-import day01 from './day01';
+import day01, { day01PartTwo } from './day01';
 import day02 from './day02';
 
-const days = [day01, day02];
+type Day = {
+  main: () => void;
+  partTwo?: () => void;
+};
+
+const days: Day[] = [
+  {
+    main: day01,
+    partTwo: day01PartTwo,
+  },
+  {
+    main: day02,
+  },
+];
+
+const runDay = (index: number) => {
+  const day = days[index];
+
+  console.log('day:', index + 1);
+  console.log(day.main());
+  console.log('----');
+
+  if (day.partTwo) {
+    console.log('day:', index + 1, 'part 2');
+    console.log(day.partTwo());
+    console.log('----');
+  }
+};
 
 const main = () => {
   const argv = yargs(hideBin(process.argv)).argv;
 
-  const dayIdx = argv._.length === 1 ? (argv._[0] as number) : undefined;
+  const dayIdx = argv._.length === 1 ? (argv._[0] as number) - 1 : undefined;
 
   if (dayIdx) {
-    console.log(days[dayIdx - 1]());
+    runDay(dayIdx);
     return;
   }
 
-  days.forEach((day, index) => {
-    console.log('day:', index + 1);
-    console.log(day());
-    console.log('----');
+  days.forEach((_day, index) => {
+    runDay(index);
   });
 };
 
