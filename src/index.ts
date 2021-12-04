@@ -1,8 +1,9 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import day01 from './day01';
+import day02 from './day02';
 
-const days = [day01];
+const days = [day01, day02];
 
 const main = () => {
   const argv = yargs(hideBin(process.argv)).argv;
