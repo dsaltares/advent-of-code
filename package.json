@@ -1,0 +1,27 @@
+{
+  "name": "aoc2021",
+  "version": "1.0.0",
+  "description": "Advent of Code 2021",
+  "main": "index.js",
+  "repository": "git@github.com:dsaltares/aoc2021.git",
+  "author": "David Saltares <david.saltares@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint ./src --ext .ts && prettier --check ./src",
+    "fix": "eslint --fix ./src --ext .ts && prettier --fix ./src"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.11",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.4.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}
