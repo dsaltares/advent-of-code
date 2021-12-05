@@ -5,68 +5,96 @@ const getDiagnosticReport = () =>
     .split('\n')
     .filter((line) => !!line);
 
-const getDigitCounts = (report: string[], index: number) =>
-  report.reduce((counts, binaryNumber) => {
-    const digit = binaryNumber[index];
-    return {
-      ...counts,
-      [digit]: counts[digit] ? counts[digit] + 1 : 1,
-    };
-  }, {} as Record<string, number>);
-
-type CompareFn = (a: [string, number], b: [string, number]) => number;
-
-const mostCommonCompare = (a: [string, number], b: [string, number]) => {
-  if (a[1] - b[1] > 0) {
-    return -1;
-  } else if (a[1] - b[1] < 0) {
-    return 1;
-  }
-
-  return 0;
+export const getBitCounts = (report: string[], index: number) => {
+  const counts: Record<string, number> = { '0': 0, '1': 0 };
+  report.forEach((binaryNumber) => {
+    counts[binaryNumber[index]] += 1;
+  });
+  return counts;
 };
 
-const leastCommonCompare = (a: [string, number], b: [string, number]) => {
-  if (a[1] - b[1] > 0) {
-    return 1;
-  } else if (a[1] - b[1] < 0) {
-    return -1;
-  }
+type CommonalityBitPickerFn = (report: string[], idx: number) => string;
 
-  return 0;
-};
-
-const aggregateByDigitCommonality = (
+export const getMostCommonBitAt: CommonalityBitPickerFn = (
   report: string[],
-  fn: CompareFn
+  idx: number
+) => {
+  const counts = getBitCounts(report, idx);
+  return counts['1'] >= counts['0'] ? '1' : '0';
+};
+
+export const getLeastCommonBitAt: CommonalityBitPickerFn = (
+  report: string[],
+  idx: number
+) => {
+  const counts = getBitCounts(report, idx);
+  if (counts['0'] === 0) {
+    return '1';
+  } else if (counts['1'] === 0) {
+    return '0';
+  }
+
+  return counts['0'] <= counts['1'] ? '0' : '1';
+};
+
+const aggregateByBitCommonality = (
+  report: string[],
+  pickBit: CommonalityBitPickerFn
 ): number => {
   if (report.length === 0) {
     return 0;
   }
-
   const aggregated = Array.from(Array(report[0].length).keys()).reduce(
-    (acc, idx) => {
-      const counts = getDigitCounts(report, idx);
-      const sorted = Object.entries(counts).sort(fn);
-      const topDigit = sorted[0][0];
-      return acc + topDigit;
-    },
+    (acc, idx) => acc + pickBit(report, idx),
     ''
   );
   return parseInt(aggregated, 2);
 };
 
+const aggregateByBitCriteria = (
+  report: string[],
+  pickBit: CommonalityBitPickerFn
+) => {
+  if (report.length === 0) {
+    return 0;
+  }
+
+  const numBits = report[0].length;
+  let filteredReport = [...report];
+  for (let idx = 0; idx < numBits && filteredReport.length > 1; idx++) {
+    const bit = pickBit(filteredReport, idx);
+    filteredReport = filteredReport.filter(
+      (binaryNumber) => binaryNumber[idx] === bit
+    );
+  }
+
+  return parseInt(filteredReport[0], 2);
+};
+
 export const getGammaRate = (report: string[]) =>
-  aggregateByDigitCommonality(report, mostCommonCompare);
+  aggregateByBitCommonality(report, getMostCommonBitAt);
 
 export const getEpsilonRate = (report: string[]) =>
-  aggregateByDigitCommonality(report, leastCommonCompare);
+  aggregateByBitCommonality(report, getLeastCommonBitAt);
 
 const day03 = () => {
   const report = getDiagnosticReport();
   const gammaRate = getGammaRate(report);
   const epsilonRate = getEpsilonRate(report);
   return gammaRate * epsilonRate;
+};
+
+export const getOxygenGeneratorRating = (report: string[]) =>
+  aggregateByBitCriteria(report, getMostCommonBitAt);
+
+export const getCO2ScrubberRating = (report: string[]) =>
+  aggregateByBitCriteria(report, getLeastCommonBitAt);
+
+export const day03PartTwo = () => {
+  const report = getDiagnosticReport();
+  const oxygenGeneratorRating = getOxygenGeneratorRating(report);
+  const co2ScrubberRating = getCO2ScrubberRating(report);
+  return oxygenGeneratorRating * co2ScrubberRating;
 };
 
 export default day03;
