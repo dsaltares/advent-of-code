@@ -18,6 +18,8 @@ type Size = {
   width: number;
 };
 
+type SegmentFilterFn = (segment: Segment) => boolean;
+
 export const createVentSegments = (rows: string[]): Segment[] => {
   const ventLines: Segment[] = [];
   rows.forEach((row) => {
@@ -69,22 +71,35 @@ const isHorizontalOrVertical = (segment: Segment) => {
   return isHorizontal || isVertical;
 };
 
+const is45Degrees = (segment: Segment) => {
+  const horizontalDif = Math.abs(segment.start.x - segment.end.x);
+  const verticalDiff = Math.abs(segment.start.y - segment.end.y);
+  return horizontalDif === verticalDiff;
+};
+
+export const isHorizontalVerticalOr45Degrees = (segment: Segment) => {
+  return isHorizontalOrVertical(segment) || is45Degrees(segment);
+};
+
 export const generateDangerMap = (
   emptyDangerMap: DangerMap,
-  segments: Segment[]
+  segments: Segment[],
+  filterFn: SegmentFilterFn = isHorizontalOrVertical
 ): DangerMap => {
   const dangerMap = cloneDeep(emptyDangerMap);
-  const validSegments = segments.filter(isHorizontalOrVertical);
+  const validSegments = segments.filter(filterFn);
   validSegments.forEach((segment) => {
-    const minX = Math.min(segment.start.x, segment.end.x);
-    const maxX = Math.max(segment.start.x, segment.end.x);
-    const minY = Math.min(segment.start.y, segment.end.y);
-    const maxY = Math.max(segment.start.y, segment.end.y);
+    const steps = Math.max(
+      Math.abs(segment.start.x - segment.end.x),
+      Math.abs(segment.start.y - segment.end.y)
+    );
+    const horizontalDir = Math.sign(segment.end.x - segment.start.x);
+    const verticalDir = Math.sign(segment.end.y - segment.start.y);
 
-    for (let rowIdx = minY; rowIdx <= maxY; rowIdx++) {
-      for (let colIdx = minX; colIdx <= maxX; colIdx++) {
-        dangerMap[rowIdx][colIdx] += 1;
-      }
+    for (let idx = 0; idx <= steps; ++idx) {
+      const colIdx = segment.start.x + idx * horizontalDir;
+      const rowIdx = segment.start.y + idx * verticalDir;
+      dangerMap[rowIdx][colIdx] += 1;
     }
   });
 
@@ -107,7 +122,24 @@ const day05 = () => {
   const segments = readVentSegments();
   const size = getMapSize(segments);
   const emptyDangerMap = initializeDangerMap(size);
-  const dangerMap = generateDangerMap(emptyDangerMap, segments);
+  const dangerMap = generateDangerMap(
+    emptyDangerMap,
+    segments,
+    isHorizontalOrVertical
+  );
+  const count = numberOfDangerousPoints(dangerMap);
+  return count;
+};
+
+export const day05PartTwo = () => {
+  const segments = readVentSegments();
+  const size = getMapSize(segments);
+  const emptyDangerMap = initializeDangerMap(size);
+  const dangerMap = generateDangerMap(
+    emptyDangerMap,
+    segments,
+    isHorizontalVerticalOr45Degrees
+  );
   const count = numberOfDangerousPoints(dangerMap);
   return count;
 };

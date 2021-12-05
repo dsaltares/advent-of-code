@@ -4,7 +4,7 @@ import day01, { day01PartTwo } from './day01';
 import day02, { day02PartTwo } from './day02';
 import day03, { day03PartTwo } from './day03';
 import day04, { day04PartTwo } from './day04';
-import day05 from './day05';
+import day05, { day05PartTwo } from './day05';
 
 type Day = {
   main: () => void;
@@ -30,6 +30,7 @@ const days: Day[] = [
   },
   {
     main: day05,
+    partTwo: day05PartTwo,
   },
 ];
 

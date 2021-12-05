@@ -4,6 +4,7 @@ import {
   initializeDangerMap,
   generateDangerMap,
   numberOfDangerousPoints,
+  isHorizontalVerticalOr45Degrees,
   Segment,
   DangerMap,
 } from './day05';
@@ -100,30 +101,32 @@ describe('generateDangerMap', () => {
   it('generates correct danger map for segments', () => {
     const size = getMapSize(segments);
     const emptyDangerMap = initializeDangerMap(size);
-    const dangerMap = generateDangerMap(emptyDangerMap, segments);
-
-    expect(dangerMap).toEqual([
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-      [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-      [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-      [0, 1, 1, 2, 1, 1, 1, 2, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [2, 2, 2, 1, 1, 1, 0, 0, 0, 0],
-    ]);
-  });
-});
-
-describe('generateDangerMap', () => {
-  it('generates correct danger map for segments', () => {
-    const size = getMapSize(segments);
-    const emptyDangerMap = initializeDangerMap(size);
     const result = generateDangerMap(emptyDangerMap, segments);
 
     expect(result).toEqual(dangerMap);
+  });
+
+  it('generates correct danger map for segments when accepting 45 degree angles', () => {
+    const size = getMapSize(segments);
+    const emptyDangerMap = initializeDangerMap(size);
+    const result = generateDangerMap(
+      emptyDangerMap,
+      segments,
+      isHorizontalVerticalOr45Degrees
+    );
+
+    expect(result).toEqual([
+      [1, 0, 1, 0, 0, 0, 0, 1, 1, 0],
+      [0, 1, 1, 1, 0, 0, 0, 2, 0, 0],
+      [0, 0, 2, 0, 1, 0, 1, 1, 1, 0],
+      [0, 0, 0, 1, 0, 2, 0, 2, 0, 0],
+      [0, 1, 1, 2, 3, 1, 3, 2, 1, 1],
+      [0, 0, 0, 1, 0, 2, 0, 0, 0, 0],
+      [0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+      [0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+      [1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [2, 2, 2, 1, 1, 1, 0, 0, 0, 0],
+    ]);
   });
 });
 
@@ -132,5 +135,23 @@ describe('numberOfDangerousPoints', () => {
     const count = numberOfDangerousPoints(dangerMap);
 
     expect(count).toEqual(5);
+  });
+});
+
+describe('isHorizontalVerticalOr45Degrees', () => {
+  it('returns true for 45 degrees', () => {
+    expect(
+      isHorizontalVerticalOr45Degrees({
+        start: { x: 1, y: 1 },
+        end: { x: 3, y: 3 },
+      })
+    ).toEqual(true);
+
+    expect(
+      isHorizontalVerticalOr45Degrees({
+        start: { x: 9, y: 7 },
+        end: { x: 7, y: 9 },
+      })
+    ).toEqual(true);
   });
 });
