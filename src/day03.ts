@@ -5,15 +5,14 @@ const getDiagnosticReport = () =>
     .split('\n')
     .filter((line) => !!line);
 
-const getDigitCounts = (report: string[], index: number) => {
-  const counts: Record<string, number> = {};
-  report.forEach((binaryNumber) => {
+const getDigitCounts = (report: string[], index: number) =>
+  report.reduce((counts, binaryNumber) => {
     const digit = binaryNumber[index];
-    const oldCount = counts[digit] || 0;
-    counts[digit] = oldCount + 1;
-  });
-  return counts;
-};
+    return {
+      ...counts,
+      [digit]: counts[digit] ? counts[digit] + 1 : 1,
+    };
+  }, {} as Record<string, number>);
 
 type CompareFn = (a: [string, number], b: [string, number]) => number;
 
@@ -37,7 +36,10 @@ const leastCommonCompare = (a: [string, number], b: [string, number]) => {
   return 0;
 };
 
-const aggregateDigits = (report: string[], fn: CompareFn): number => {
+const aggregateByDigitCommonality = (
+  report: string[],
+  fn: CompareFn
+): number => {
   if (report.length === 0) {
     return 0;
   }
@@ -55,10 +57,10 @@ const aggregateDigits = (report: string[], fn: CompareFn): number => {
 };
 
 export const getGammaRate = (report: string[]) =>
-  aggregateDigits(report, mostCommonCompare);
+  aggregateByDigitCommonality(report, mostCommonCompare);
 
 export const getEpsilonRate = (report: string[]) =>
-  aggregateDigits(report, leastCommonCompare);
+  aggregateByDigitCommonality(report, leastCommonCompare);
 
 const day03 = () => {
   const report = getDiagnosticReport();
