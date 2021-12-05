@@ -4,16 +4,12 @@ import cloneDeep from 'lodash.clonedeep';
 export type Board = {
   numbers: number[][];
   marked: boolean[][];
+  winningTurn?: number;
 };
 
 export type Game = {
   numbers: number[];
   boards: Board[];
-};
-
-export type GameResult = {
-  winner: Board;
-  lastNumber: number;
 };
 
 const createBoard = (lines: string[]): Board => ({
@@ -51,7 +47,15 @@ const getGame = () => {
   return createGame(lines);
 };
 
-const markNumberOnBoard = (board: Board, number: number) => {
+const isWinner = (board: Board) => {
+  const hasLine = board.marked.some((line) => line.every((mark) => !!mark));
+  const hasColumn = Array.from(Array(5).keys()).some((colIdx) =>
+    board.marked.every((line) => !!line[colIdx])
+  );
+  return hasLine || hasColumn;
+};
+
+const markNumberOnBoard = (board: Board, number: number, turn: number) => {
   board.numbers.forEach((line, lineIdx) => {
     line.forEach((current, colIdx) => {
       if (current === number) {
@@ -59,55 +63,83 @@ const markNumberOnBoard = (board: Board, number: number) => {
       }
     });
   });
+  if (isWinner(board)) {
+    board.winningTurn = turn;
+  }
 };
 
-const getWinner = (game: Game) => {
-  return game.boards.filter((board) => {
-    const hasLine = board.marked.some((line) => line.every((mark) => !!mark));
-    const hasColumn = Array.from(Array(5).keys()).some((colIdx) =>
-      board.marked.every((line) => !!line[colIdx])
-    );
-    return hasLine || hasColumn;
-  })[0];
+const getCurrentWinner = (game: Game) => {
+  return game.boards.filter((board) => board.winningTurn !== undefined)[0];
 };
 
-export const getResult = (game: Game): GameResult => {
+export const getWinningBoard = (game: Game): Board | undefined => {
   const current = cloneDeep(game);
-  let winner: Board | undefined = undefined;
   let lastNumber: number | undefined;
   let turn = 0;
-  while (!winner && turn < current.numbers.length) {
+  while (turn < current.numbers.length) {
     lastNumber = current.numbers[turn];
     current.boards.forEach((board) =>
-      markNumberOnBoard(board, lastNumber as number)
+      markNumberOnBoard(board, lastNumber as number, turn)
     );
-    winner = getWinner(current);
+
+    const winner = getCurrentWinner(current);
+    if (winner) {
+      return winner;
+    }
+
     turn += 1;
   }
-
-  return {
-    winner: winner as Board,
-    lastNumber: lastNumber as number,
-  };
 };
 
-export const getScore = (result: GameResult) => {
+export const getLosingBoard = (game: Game): Board | undefined => {
+  const current = cloneDeep(game);
+  let lastNumber: number | undefined;
+  let losingBoards: Board[] = current.boards;
+  let turn = 0;
+  while (turn < current.numbers.length) {
+    lastNumber = current.numbers[turn];
+
+    losingBoards.forEach((board) =>
+      markNumberOnBoard(board, lastNumber as number, turn)
+    );
+
+    const newLosingBoards = losingBoards.filter(
+      (board) => board.winningTurn === undefined
+    );
+
+    if (newLosingBoards.length === 0) {
+      return losingBoards[0];
+    }
+
+    losingBoards = newLosingBoards;
+    turn += 1;
+  }
+};
+
+export const getScore = (board: Board, numbers: number[]) => {
   let unMarkedSum = 0;
-  result.winner.numbers.forEach((line, lineIdx) =>
+  board.numbers.forEach((line, lineIdx) =>
     line.forEach((number, colIdx) => {
-      const marked = result.winner.marked[lineIdx][colIdx];
+      const marked = board.marked[lineIdx][colIdx];
       if (!marked) {
         unMarkedSum += number;
       }
     })
   );
-  return unMarkedSum * result.lastNumber;
+  return unMarkedSum * numbers[board.winningTurn as number];
 };
 
 const day04 = () => {
   const game = getGame();
-  const result = getResult(game);
-  const score = getScore(result);
+  const winner = getWinningBoard(game);
+  const score = getScore(winner as Board, game.numbers);
+  return score;
+};
+
+export const day04PartTwo = () => {
+  const game = getGame();
+  const loser = getLosingBoard(game);
+  const score = getScore(loser as Board, game.numbers);
   return score;
 };
 
