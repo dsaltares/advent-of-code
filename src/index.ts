@@ -8,64 +8,87 @@ import day05, { day05PartTwo } from './2021/day05';
 import day06, { day06PartTwo } from './2021/day06';
 
 type Day = {
-  main: () => void;
-  partTwo?: () => void;
+  partOne: () => unknown;
+  partTwo?: () => unknown;
 };
 
-const days: Day[] = [
-  {
-    main: day01,
-    partTwo: day01PartTwo,
-  },
-  {
-    main: day02,
-    partTwo: day02PartTwo,
-  },
-  {
-    main: day03,
-    partTwo: day03PartTwo,
-  },
-  {
-    main: day04,
-    partTwo: day04PartTwo,
-  },
-  {
-    main: day05,
-    partTwo: day05PartTwo,
-  },
-  {
-    main: day06,
-    partTwo: day06PartTwo,
-  },
-];
+type Solutions = Record<string, Day[]>;
 
-const runDay = (index: number) => {
-  const day = days[index];
-
-  console.log('day:', index + 1);
-  console.log(day.main());
-  console.log('----');
-
-  if (day.partTwo) {
-    console.log('day:', index + 1, 'part 2');
-    console.log(day.partTwo());
-    console.log('----');
-  }
+const solutions: Solutions = {
+  2021: [
+    {
+      partOne: day01,
+      partTwo: day01PartTwo,
+    },
+    {
+      partOne: day02,
+      partTwo: day02PartTwo,
+    },
+    {
+      partOne: day03,
+      partTwo: day03PartTwo,
+    },
+    {
+      partOne: day04,
+      partTwo: day04PartTwo,
+    },
+    {
+      partOne: day05,
+      partTwo: day05PartTwo,
+    },
+    {
+      partOne: day06,
+      partTwo: day06PartTwo,
+    },
+  ],
 };
 
 const main = () => {
-  const argv = yargs(hideBin(process.argv)).argv;
+  const argv = yargs(hideBin(process.argv))
+    .scriptName('advent-of-code')
+    .usage('Usage: $0 -y num -d num')
+    .example(
+      '$0 -y 2021 -d 5',
+      'Runs the Advent of Code solution for the 5th day of the 2021 challenge'
+    )
+    .option('y', {
+      alias: 'year',
+      describe: 'The year',
+      type: 'number',
+    })
+    .option('d', {
+      alias: 'day',
+      describe: 'The day',
+      type: 'number',
+    })
+    .help()
+    .strict().argv;
 
-  const dayIdx = argv._.length === 1 ? (argv._[0] as number) - 1 : undefined;
+  Object.keys(solutions)
+    .sort()
+    .forEach((year) => {
+      if (argv.y !== undefined && argv.y !== parseInt(year, 10)) {
+        return;
+      }
 
-  if (dayIdx) {
-    runDay(dayIdx);
-    return;
-  }
+      console.log('');
+      console.log('🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅');
+      console.log(`🎄 Advent of Code - Year ${year} 🎄`);
+      console.log('🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅🎅');
 
-  days.forEach((_day, index) => {
-    runDay(index);
-  });
+      const days = solutions[year];
+      days.forEach((day, dayIndex) => {
+        if (argv.d !== undefined && argv.d !== dayIndex + 1) {
+          return;
+        }
+
+        console.log('🌟 day:', dayIndex + 1);
+        console.log('  - part 1:', day.partOne());
+        if (day.partTwo) {
+          console.log('  - part 2:', day.partTwo());
+        }
+      });
+    });
 };
 
 main();

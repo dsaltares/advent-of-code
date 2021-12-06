@@ -8,8 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "ts-node src/index.ts",
+    "aoc": "ts-node src/index.ts",
     "lint": "eslint ./src --ext .ts && prettier --check ./src",
     "fix": "eslint --fix ./src --ext .ts && prettier --fix ./src",
     "test": "jest"
