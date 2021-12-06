@@ -1,11 +1,11 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
-import day01, { day01PartTwo } from './day01';
-import day02, { day02PartTwo } from './day02';
-import day03, { day03PartTwo } from './day03';
-import day04, { day04PartTwo } from './day04';
-import day05, { day05PartTwo } from './day05';
-import day06, { day06PartTwo } from './day06';
+import day01, { day01PartTwo } from './2021/day01';
+import day02, { day02PartTwo } from './2021/day02';
+import day03, { day03PartTwo } from './2021/day03';
+import day04, { day04PartTwo } from './2021/day04';
+import day05, { day05PartTwo } from './2021/day05';
+import day06, { day06PartTwo } from './2021/day06';
 
 type Day = {
   main: () => void;

@@ -17,7 +17,7 @@ type PositionWithAim = Position & {
 };
 
 const getCommands = (): Command[] =>
-  readFileSync('./data/day02.txt', 'utf8')
+  readFileSync('./data/2021/day02.txt', 'utf8')
     .split('\n')
     .filter((line) => !!line)
     .map((line) => {

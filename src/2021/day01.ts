@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
 const getDepthsMeasurements = () =>
-  readFileSync('./data/day01.txt', 'utf-8')
+  readFileSync('./data/2021/day01.txt', 'utf-8')
     .split('\n')
     .filter((line) => !!line)
     .map((line) => parseInt(line, 10));

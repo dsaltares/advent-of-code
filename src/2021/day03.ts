@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
 const getDiagnosticReport = () =>
-  readFileSync('./data/day03.txt', 'utf8')
+  readFileSync('./data/2021/day03.txt', 'utf8')
     .split('\n')
     .filter((line) => !!line);
 

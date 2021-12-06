@@ -40,7 +40,7 @@ export const createGame = (lines: string[]) => {
 };
 
 const getGame = () => {
-  const lines = readFileSync('./data/day04.txt', 'utf-8')
+  const lines = readFileSync('./data/2021/day04.txt', 'utf-8')
     .split('\n')
     .filter((line) => !!line);
 

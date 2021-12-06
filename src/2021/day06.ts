@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
 const readLanternFish = () =>
-  readFileSync('./data/day06.txt', 'utf-8')
+  readFileSync('./data/2021/day06.txt', 'utf-8')
     .split(',')
     .map((number) => parseInt(number.trimStart().trimEnd(), 10));
 

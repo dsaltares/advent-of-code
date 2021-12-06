@@ -42,7 +42,7 @@ export const createVentSegments = (rows: string[]): Segment[] => {
 };
 
 const readVentSegments = () => {
-  const rows = readFileSync('./data/day05.txt', 'utf-8')
+  const rows = readFileSync('./data/2021/day05.txt', 'utf-8')
     .split('\n')
     .filter((line) => !!line);
 
