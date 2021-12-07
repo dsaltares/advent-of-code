@@ -1,16 +1,18 @@
 import {
   getPositionAfterCommands,
-  getPositionWithAimAfterCommands,
+  applyCommand,
+  applyCommandWithAim,
   Command,
 } from './day02';
 
 describe('getPositionAfterCommands', () => {
   it('returns initial position after 0 commands', () => {
     const commands: Command[] = [];
-    const position = getPositionAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommand);
     expect(position).toEqual({
       horizontal: 0,
       depth: 0,
+      aim: 0,
     });
   });
 
@@ -25,10 +27,11 @@ describe('getPositionAfterCommands', () => {
         amount: 2,
       },
     ];
-    const position = getPositionAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommand);
     expect(position).toEqual({
       horizontal: 4,
       depth: -2,
+      aim: 0,
     });
   });
 
@@ -43,10 +46,11 @@ describe('getPositionAfterCommands', () => {
         amount: 3,
       },
     ];
-    const position = getPositionAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommand);
     expect(position).toEqual({
       horizontal: 1,
       depth: 3,
+      aim: 0,
     });
   });
 
@@ -69,18 +73,19 @@ describe('getPositionAfterCommands', () => {
         amount: 3,
       },
     ];
-    const position = getPositionAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommand);
     expect(position).toEqual({
       horizontal: 3,
       depth: 1,
+      aim: 0,
     });
   });
 });
 
-describe('getPositionWithAimAfterCommands', () => {
+describe('getPositionAfterCommands with aim', () => {
   it('returns initial position after 0 commands', () => {
     const commands: Command[] = [];
-    const position = getPositionWithAimAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommandWithAim);
     expect(position).toEqual({
       horizontal: 0,
       depth: 0,
@@ -99,7 +104,7 @@ describe('getPositionWithAimAfterCommands', () => {
         amount: 2,
       },
     ];
-    const position = getPositionWithAimAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommandWithAim);
     expect(position).toEqual({
       horizontal: 4,
       depth: 0,
@@ -118,7 +123,7 @@ describe('getPositionWithAimAfterCommands', () => {
         amount: 3,
       },
     ];
-    const position = getPositionWithAimAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommandWithAim);
     expect(position).toEqual({
       horizontal: 1,
       depth: 0,
@@ -145,7 +150,7 @@ describe('getPositionWithAimAfterCommands', () => {
         amount: 3,
       },
     ];
-    const position = getPositionWithAimAfterCommands(commands);
+    const position = getPositionAfterCommands(commands, applyCommandWithAim);
     expect(position).toEqual({
       horizontal: 3,
       depth: 8,
