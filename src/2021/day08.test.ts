@@ -2,6 +2,8 @@ import {
   Entry,
   createMalfunctioningEntries,
   countDigitsWithUniqueNumberOfSegments,
+  decodeOutput,
+  sumOfDecodedOutputDigits,
 } from './day08';
 
 const input = `
@@ -181,5 +183,35 @@ describe('countDigitsWithUniqueNumberOfSegments', () => {
   it('returns correct count of digits with unique number of segments for sample input', () => {
     const count = countDigitsWithUniqueNumberOfSegments(sampleEntries);
     expect(count).toEqual(26);
+  });
+});
+
+describe('decodeOutput', () => {
+  it('correctly decodes output for a sample entry', () => {
+    const entry: Entry = {
+      signalPatterns: [
+        'acedgfb',
+        'cdfbe',
+        'gcdfa',
+        'fbcad',
+        'dab',
+        'cefabd',
+        'cdfgeb',
+        'eafb',
+        'cagedb',
+        'ab',
+      ],
+      output: ['cdfeb', 'fcadb', 'cdfeb', 'cdbaf'],
+    };
+
+    const output = decodeOutput(entry);
+    expect(output).toEqual(5353);
+  });
+});
+
+describe('sumOfDecodedOutputDigits', () => {
+  it('returns correct sum of decoded digits for sample input', () => {
+    const sum = sumOfDecodedOutputDigits(sampleEntries);
+    expect(sum).toEqual(61229);
   });
 });
