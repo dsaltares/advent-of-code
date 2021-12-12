@@ -106,9 +106,31 @@ const countFlashesAfterSteps = (octopuses: number[][], steps: number) => {
   return flashes;
 };
 
+const getFirstStepWhenAllFlash = (octopuses: number[][]) => {
+  let step = 0;
+  let updated = octopuses;
+  let flashed = 0;
+  const height = octopuses.length;
+  const width = octopuses[0].length;
+  const numOctopuses = width * height;
+
+  while (flashed !== numOctopuses) {
+    updated = stepOctopuses(updated);
+    flashed = countFlashes(updated);
+    step++;
+  }
+
+  return step;
+};
+
 const day11 = () => {
   const octopuses = readOctopuses();
   return countFlashesAfterSteps(octopuses, 100);
+};
+
+export const day11PartTwo = () => {
+  const octopuses = readOctopuses();
+  return getFirstStepWhenAllFlash(octopuses);
 };
 
 export default day11;
