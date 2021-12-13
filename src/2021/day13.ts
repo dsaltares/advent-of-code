@@ -89,7 +89,7 @@ export const applyFold = (paper: Paper) => {
       }
     }
   } else {
-    newPaper.dots.map((row) => row.slice(0, fold.value));
+    newPaper.dots = newPaper.dots.map((row) => row.slice(0, fold.value));
     newPaper.width = Math.floor(newPaper.width / 2);
     for (let x = 0; x < newPaper.width; x++) {
       for (let y = 0; y < newPaper.height; y++) {
@@ -102,10 +102,31 @@ export const applyFold = (paper: Paper) => {
   return newPaper;
 };
 
+export const applyAllFolds = (paper: Paper) => {
+  let newPaper = cloneDeep(paper);
+  while (newPaper.folds.length > 0) {
+    newPaper = applyFold(newPaper);
+  }
+  return newPaper;
+};
+
+export const dotsToDisplay = (paper: Paper) =>
+  paper.dots.reduce(
+    (acc: string, row) =>
+      `${acc}\n${row.map((value) => (value ? '#' : '.')).join('')}`,
+    ''
+  );
+
 const day13 = () => {
   const paper = readTransparentPaper();
   const updated = applyFold(paper);
   return countDots(updated);
+};
+
+export const day13PartTwo = () => {
+  let paper = readTransparentPaper();
+  paper = applyAllFolds(paper);
+  return dotsToDisplay(paper);
 };
 
 export default day13;

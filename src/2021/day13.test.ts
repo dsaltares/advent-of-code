@@ -1,4 +1,10 @@
-import { createTransparentPaper, countDots, applyFold, Paper } from './day13';
+import {
+  createTransparentPaper,
+  countDots,
+  applyFold,
+  applyAllFolds,
+  dotsToDisplay,
+} from './day13';
 
 const data = `
   6,10
@@ -43,5 +49,18 @@ describe('applyFold', () => {
     const count = countDots(updated);
 
     expect(count).toEqual(17);
+  });
+});
+
+describe('applyAllFolds', () => {
+  it('correctly applies all folds for sample input', () => {
+    const paper = createTransparentPaper(data);
+    const updated = applyAllFolds(paper);
+    const count = countDots(updated);
+
+    console.log(dotsToDisplay(updated));
+
+    expect(updated.folds).toHaveLength(0);
+    expect(count).toEqual(16);
   });
 });
