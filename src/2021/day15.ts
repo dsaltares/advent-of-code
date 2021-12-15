@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import minBy from 'lodash.minby';
 
 type Node = {
   x: number;
@@ -39,24 +38,27 @@ const dijkstra = (map: number[][]) => {
 
   const distances: Record<number, number> = {};
   const previous: Record<number, number | undefined> = {};
-  const toVisit = new Set<number>();
-  nodes.forEach((node, idx) => {
+  const queue: number[] = [];
+  nodes.forEach((_, idx) => {
     distances[idx] = Infinity;
     previous[idx] = undefined;
-    toVisit.add(idx);
   });
 
   distances[0] = 0;
+  queue.push(0);
 
-  while (toVisit.size > 0) {
-    const topIdx = minBy([...toVisit], (idx) => distances[idx]) as number;
-    toVisit.delete(topIdx);
+  while (queue.length > 0) {
+    const topIdx = queue.pop() as number;
 
     getAdjacentIdx(nodes[topIdx], width, height).forEach((adjacentIdx) => {
       const newDistance = distances[topIdx] + nodes[adjacentIdx].risk;
       if (newDistance < distances[adjacentIdx]) {
         distances[adjacentIdx] = newDistance;
         previous[adjacentIdx] = topIdx;
+        queue.push(adjacentIdx);
+        queue.sort(
+          (firstIdx, secondIdx) => distances[secondIdx] - distances[firstIdx]
+        );
       }
     });
   }
@@ -73,9 +75,40 @@ export const getRiskBetweenStartAndFinish = (map: number[][]) => {
   return result.distances[result.nodes.length - 1];
 };
 
+const wrap = (x: number, lowerBound: number, upperBound: number) => {
+  const rangeSize = upperBound - lowerBound + 1;
+  return lowerBound + ((x - lowerBound) % rangeSize);
+};
+
+export const expandMap = (map: number[][]) => {
+  const height = map.length;
+  const width = map[0].length;
+  const factor = 5;
+
+  const newMap: number[][] = Array.from(Array(height * factor)).map(() =>
+    Array.from(Array(width * factor).fill(0))
+  );
+  for (let x = 0; x < width * factor; ++x) {
+    for (let y = 0; y < height * factor; ++y) {
+      const riskAddition = Math.floor(x / width) + Math.floor(y / height);
+      const originalRisk = map[y % height][x % width];
+      const newRisk = wrap(originalRisk + riskAddition, 1, 9);
+      newMap[y][x] = newRisk;
+    }
+  }
+
+  return newMap;
+};
+
 const day15 = () => {
   const map = readMap();
   return getRiskBetweenStartAndFinish(map);
+};
+
+export const day15PartTwo = () => {
+  const map = readMap();
+  const expandedMap = expandMap(map);
+  return getRiskBetweenStartAndFinish(expandedMap);
 };
 
 export default day15;
