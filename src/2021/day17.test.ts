@@ -2,6 +2,7 @@ import {
   createArea,
   stepProbe,
   highestYPositionInValidTrajectory,
+  numberOfValidInitialVelocities,
 } from './day17';
 
 describe('createArea', () => {
@@ -60,5 +61,17 @@ describe('highestYPositionInValidTrajectory', () => {
     const highestY = highestYPositionInValidTrajectory(area);
 
     expect(highestY).toEqual(45);
+  });
+});
+
+describe('numberOfValidInitialVelocities', () => {
+  it('returns number of valid velocities for sample target area', () => {
+    const area = {
+      position: { x: 20, y: -10 },
+      size: { x: 10, y: 5 },
+    };
+    const num = numberOfValidInitialVelocities(area);
+
+    expect(num).toEqual(112);
   });
 });

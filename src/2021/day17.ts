@@ -46,12 +46,11 @@ export const inTargetArea = (position: Vec2, area: Area) =>
 export const hasOvershot = (position: Vec2, area: Area) =>
   position.x > area.position.x + area.size.x || position.y < area.position.y;
 
-export const highestYPositionInValidTrajectory = (area: Area) => {
-  let maxY = 0;
-
+export const getValidVelocities = (area: Area) => {
+  const validVelocities = [];
   for (let velX = 0; velX < area.position.x + area.size.x + 1; ++velX) {
-    for (let velY = 0; velY < 1000; ++velY) {
-      let trajectoryMaxY = 0;
+    for (let velY = -1000; velY < 1000; ++velY) {
+      let maxY = 0;
       let isValidTrajectory = false;
       let position = { x: 0, y: 0 };
       let velocity = { x: velX, y: velY };
@@ -59,21 +58,35 @@ export const highestYPositionInValidTrajectory = (area: Area) => {
       while (!hasOvershot(position, area)) {
         ({ position, velocity } = stepProbe(position, velocity));
         isValidTrajectory = isValidTrajectory || inTargetArea(position, area);
-        trajectoryMaxY = Math.max(trajectoryMaxY, position.y);
+        maxY = Math.max(maxY, position.y);
       }
 
       if (isValidTrajectory) {
-        maxY = Math.max(trajectoryMaxY, maxY);
+        validVelocities.push({
+          velocity: { x: velX, y: velY },
+          maxY,
+        });
       }
     }
   }
 
-  return maxY;
+  return validVelocities;
 };
+
+export const highestYPositionInValidTrajectory = (area: Area) =>
+  Math.max(...getValidVelocities(area).map((valid) => valid.maxY));
+
+export const numberOfValidInitialVelocities = (area: Area) =>
+  getValidVelocities(area).length;
 
 const day17 = () => {
   const area = readArea();
   return highestYPositionInValidTrajectory(area);
+};
+
+export const day17PartTwo = () => {
+  const area = readArea();
+  return numberOfValidInitialVelocities(area);
 };
 
 export default day17;
