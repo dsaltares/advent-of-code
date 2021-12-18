@@ -122,10 +122,32 @@ export const add = (first: SnailNumber, second: SnailNumber): SnailNumber =>
 export const addNumbers = (numbers: SnailNumber[]) =>
   numbers.slice(1).reduce((sum, acc) => add(sum, acc), numbers[0]);
 
+export const largestMagnitudeSumAnyTwo = (numbers: SnailNumber[]) => {
+  let maxMagnitude = 0;
+  for (let firstIdx = 0; firstIdx < numbers.length; ++firstIdx) {
+    for (let secondIdx = 0; secondIdx < numbers.length; ++secondIdx) {
+      if (firstIdx === secondIdx) {
+        continue;
+      }
+
+      const result = add(numbers[firstIdx], numbers[secondIdx]);
+      const mag = magnitude(result);
+
+      maxMagnitude = Math.max(mag, maxMagnitude);
+    }
+  }
+  return maxMagnitude;
+};
+
 const day18 = () => {
   const numbers = readSnailNumbers();
   const result = addNumbers(numbers);
   return magnitude(result);
+};
+
+export const day18PartTwo = () => {
+  const numbers = readSnailNumbers();
+  return largestMagnitudeSumAnyTwo(numbers);
 };
 
 export default day18;
