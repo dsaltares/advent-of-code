@@ -2,8 +2,14 @@
 import { readFileSync } from 'fs';
 
 export enum PacketType {
+  Sum = 0,
+  Product = 1,
+  Minimum = 2,
+  Maximum = 3,
   Literal = 4,
-  Operator,
+  GreaterThan = 5,
+  LessThan = 6,
+  Equal = 7,
 }
 
 export type Header = {
@@ -51,8 +57,7 @@ export const parseHeader = (bits: number[], cursor: number) => {
     newCursor: cursor + VersionLength + TypeLength,
     header: {
       version,
-      type:
-        type === PacketType.Literal ? PacketType.Literal : PacketType.Operator,
+      type,
     },
   };
 };
@@ -157,10 +162,51 @@ export const sumVersions = (packet: Packet): number =>
   packet.header.version +
   packet.packets.reduce((sum, subpacket) => sum + sumVersions(subpacket), 0);
 
+export const evalPacket = (packet: Packet): number => {
+  switch (packet.header.type) {
+    case PacketType.Sum:
+      return packet.packets.reduce(
+        (sum, current) => sum + evalPacket(current),
+        0
+      );
+    case PacketType.Product:
+      return packet.packets.reduce(
+        (product, current) => product * evalPacket(current),
+        1
+      );
+    case PacketType.Minimum:
+      return Math.min(...packet.packets.map(evalPacket));
+    case PacketType.Maximum:
+      return Math.max(...packet.packets.map(evalPacket));
+    case PacketType.Literal:
+      return packet.value as number;
+    case PacketType.GreaterThan:
+      return evalPacket(packet.packets[0]) > evalPacket(packet.packets[1])
+        ? 1
+        : 0;
+    case PacketType.LessThan:
+      return evalPacket(packet.packets[0]) < evalPacket(packet.packets[1])
+        ? 1
+        : 0;
+    case PacketType.Equal:
+      return evalPacket(packet.packets[0]) === evalPacket(packet.packets[1])
+        ? 1
+        : 0;
+    default:
+      return 0;
+  }
+};
+
 const day16 = () => {
   const bits = readBitArray();
   const { packet } = parsePacket(bits) as ParseResult;
   return sumVersions(packet);
+};
+
+export const day16PartTwo = () => {
+  const bits = readBitArray();
+  const { packet } = parsePacket(bits) as ParseResult;
+  return evalPacket(packet);
 };
 
 export default day16;

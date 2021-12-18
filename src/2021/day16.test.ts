@@ -5,6 +5,8 @@ import {
   PacketType,
   parsePacket,
   sumVersions,
+  evalPacket,
+  ParseResult,
 } from './day16';
 
 describe('createBitsFromHex', () => {
@@ -24,7 +26,7 @@ describe('parseHeader', () => {
     const { header, newCursor } = parseHeader(bits, 0);
 
     expect(header).toEqual({
-      type: PacketType.Operator,
+      type: PacketType.LessThan,
       version: 1,
     });
     expect(newCursor).toEqual(6);
@@ -72,7 +74,7 @@ describe('parsePacket', () => {
     expect(packet).toEqual({
       header: {
         version: 1,
-        type: PacketType.Operator,
+        type: PacketType.LessThan,
       },
       packets: [
         {
@@ -101,7 +103,7 @@ describe('sumVersions', () => {
     const packet: Packet = {
       header: {
         version: 1,
-        type: PacketType.Operator,
+        type: PacketType.GreaterThan,
       },
       packets: [
         {
@@ -125,5 +127,60 @@ describe('sumVersions', () => {
     const sum = sumVersions(packet);
 
     expect(sum).toEqual(9);
+  });
+});
+
+describe('evalPacket', () => {
+  const cases = [
+    {
+      hex: 'C200B40A82',
+      expected: 3,
+      name: '1 + 2',
+    },
+    {
+      hex: '04005AC33890',
+      expected: 54,
+      name: '6 * 9',
+    },
+    {
+      hex: '880086C3E88112',
+      expected: 7,
+      name: 'min(7, 8, 9)',
+    },
+    {
+      hex: 'CE00C43D881120',
+      expected: 9,
+      name: 'max(7, 8, 9)',
+    },
+    {
+      hex: 'D8005AC2A8F0',
+      expected: 1,
+      name: '5 < 15',
+    },
+    {
+      hex: 'F600BC2D8F',
+      expected: 0,
+      name: '5 > 15',
+    },
+    {
+      hex: '9C005AC2F8F0',
+      expected: 0,
+      name: '5 === 15',
+    },
+    {
+      hex: '9C0141080250320F1802104A08',
+      expected: 1,
+      name: '1 + 3 === 2 * 2',
+    },
+  ];
+
+  cases.forEach((testCase) => {
+    test(`returns correct value for expression ${testCase.name}`, () => {
+      const bits = createBitsFromHex(testCase.hex);
+      const { packet } = parsePacket(bits) as ParseResult;
+      const value = evalPacket(packet);
+
+      expect(value).toEqual(testCase.expected);
+    });
   });
 });
