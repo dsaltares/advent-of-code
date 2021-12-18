@@ -58,8 +58,6 @@ describe('applyAllFolds', () => {
     const updated = applyAllFolds(paper);
     const count = countDots(updated);
 
-    console.log(dotsToDisplay(updated));
-
     expect(updated.folds).toHaveLength(0);
     expect(count).toEqual(16);
   });
