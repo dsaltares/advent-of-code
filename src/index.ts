@@ -18,7 +18,7 @@ import day15, { day15PartTwo } from './2021/day15';
 import day16, { day16PartTwo } from './2021/day16';
 import day17, { day17PartTwo } from './2021/day17';
 import day18, { day18PartTwo } from './2021/day18';
-import day19 from './2021/day19';
+import day19, { day19PartTwo } from './2021/day19';
 
 type Day = {
   partOne: () => unknown;
@@ -103,6 +103,7 @@ const solutions: Solutions = {
     },
     {
       partOne: day19,
+      partTwo: day19PartTwo,
     },
   ],
 };

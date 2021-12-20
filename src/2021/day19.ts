@@ -81,7 +81,11 @@ const sub = ([x1, y1, z1]: Vec3, [x2, y2, z2]: Vec3): Vec3 => [
   z1 - z2,
 ];
 
+const abs = ([x, y, z]: Vec3): Vec3 => [Math.abs(x), Math.abs(y), Math.abs(z)];
+
 const toKey = ([x, y, z]: Vec3) => `${x},${y},${z}`;
+const fromKey = (key: string): Vec3 =>
+  key.split(',').map((value) => parseInt(value, 10)) as Vec3;
 
 export const createScanners = (data: string) => {
   const lines = data
@@ -96,9 +100,7 @@ export const createScanners = (data: string) => {
       lineIdx < lines.length &&
       !lines[lineIdx].startsWith('--- scanner')
     ) {
-      beacons.push(
-        lines[lineIdx].split(',').map((number) => parseInt(number, 10)) as Vec3
-      );
+      beacons.push(fromKey(lines[lineIdx]));
       lineIdx++;
     }
 
@@ -164,20 +166,41 @@ export const locateScanners = (scanners: Scanner[]) => {
   return locatedScanners;
 };
 
-export const countBeacons = (scanners: Scanner[]) => {
+export const manhattanDistance = (a: Vec3, b: Vec3) => {
+  const [x, y, z] = abs(sub(a, b));
+  return x + y + z;
+};
+
+export const maxManhattanDistance = (scanners: Scanner[]) => {
+  const distances: number[] = [];
+  for (let i = 0; i < scanners.length; ++i) {
+    for (let j = i + 1; j < scanners.length; ++j) {
+      distances.push(manhattanDistance(scanners[i].point, scanners[j].point));
+    }
+  }
+  return Math.max(...distances);
+};
+
+export const uniqueBeacons = (scanners: Scanner[]) => {
   const uniquePoints = new Set<string>();
   scanners.forEach((scanner) => {
     scanner.beacons.forEach((beacon) =>
       uniquePoints.add(toKey(add(scanner.point, beacon)))
     );
   });
-  return uniquePoints.size;
+  return [...uniquePoints].map(fromKey);
 };
 
 const day19 = () => {
   const scanners = readScanners();
   const located = locateScanners(scanners);
-  return countBeacons(located);
+  return uniqueBeacons(located).length;
+};
+
+export const day19PartTwo = () => {
+  const scanners = readScanners();
+  const located = locateScanners(scanners);
+  return maxManhattanDistance(located);
 };
 
 export default day19;
