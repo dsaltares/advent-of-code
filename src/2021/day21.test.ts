@@ -1,22 +1,24 @@
-import { createGame, Game, isFinished, runGame } from './day21';
+import {
+  createPlayers,
+  isFinished,
+  runGame,
+  runQuantumGame,
+  QuantumGame,
+  Game,
+} from './day21';
 
-describe('createGame', () => {
+describe('createPlayers', () => {
   it('returns correct game from sample input', () => {
     const data = `
       Player 1 starting position: 4
       Player 2 starting position: 8
     `;
-    const game = createGame(data);
+    const players = createPlayers(data);
 
-    expect(game).toEqual({
-      players: [
-        { position: 4, score: 0 },
-        { position: 8, score: 0 },
-      ],
-      die: 1,
-      rolls: 0,
-      turn: 0,
-    });
+    expect(players).toEqual([
+      { position: 4, score: 0 },
+      { position: 8, score: 0 },
+    ]);
   });
 });
 
@@ -89,5 +91,14 @@ describe('runGame', () => {
       rolls: 993,
       turn: 1,
     });
+  });
+});
+
+describe('runQuantumGame', () => {
+  it('correctly runs the sample game in quantum mode', () => {
+    const game: QuantumGame = [4, 8, 0, 0, 0];
+    const wins = runQuantumGame(game);
+
+    expect(wins).toEqual([444356092776315, 341960390180808]);
   });
 });
