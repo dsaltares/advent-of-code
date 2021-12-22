@@ -1,18 +1,19 @@
 import { readFileSync } from 'fs';
 
-type Vec3 = {
-  x: number;
-  y: number;
-  z: number;
+type Range = [number, number];
+
+type Cuboid = {
+  x: Range;
+  y: Range;
+  z: Range;
 };
 
 type Instruction = {
   state: boolean;
-  start: Vec3;
-  end: Vec3;
+  cuboid: Cuboid;
 };
 
-type CubeState = Map<string, boolean>;
+type Core = Cuboid[];
 
 const InstructionRegExp =
   /([a-z]*) x=([-]?\d*)..([-]?\d*),y=([-]?\d*)..([-]?\d*),z=([-]?\d*)..([-]?\d*)/;
@@ -26,15 +27,10 @@ export const createInstructions = (data: string): Instruction[] =>
       const matches = line.match(InstructionRegExp) as RegExpMatchArray;
       return {
         state: matches[1] === 'on',
-        start: {
-          x: parseInt(matches[2], 10),
-          y: parseInt(matches[4], 10),
-          z: parseInt(matches[6], 10),
-        },
-        end: {
-          x: parseInt(matches[3], 10),
-          y: parseInt(matches[5], 10),
-          z: parseInt(matches[7], 10),
+        cuboid: {
+          x: [parseInt(matches[2], 10), parseInt(matches[3], 10)],
+          y: [parseInt(matches[4], 10), parseInt(matches[5], 10)],
+          z: [parseInt(matches[6], 10), parseInt(matches[7], 10)],
         },
       };
     });
@@ -42,37 +38,121 @@ export const createInstructions = (data: string): Instruction[] =>
 const readInstructions = () =>
   createInstructions(readFileSync('./data/2021/day22.txt', 'utf-8'));
 
-const isValid = (instruction: Instruction) =>
-  Math.abs(instruction.start.x) <= 50 &&
-  Math.abs(instruction.start.y) <= 50 &&
-  Math.abs(instruction.start.z) <= 50 &&
-  Math.abs(instruction.end.x) <= 50 &&
-  Math.abs(instruction.end.y) <= 50 &&
-  Math.abs(instruction.end.z) <= 50;
+const isLarge = (instruction: Instruction) =>
+  Math.abs(instruction.cuboid.x[0]) <= 50 &&
+  Math.abs(instruction.cuboid.x[1]) <= 50 &&
+  Math.abs(instruction.cuboid.y[0]) <= 50 &&
+  Math.abs(instruction.cuboid.y[1]) <= 50 &&
+  Math.abs(instruction.cuboid.z[0]) <= 50 &&
+  Math.abs(instruction.cuboid.z[1]) <= 50;
 
-const toKey = (x: number, y: number, z: number) => `${x},${y},${z}`;
-
-export const applyInstructions = (instructions: Instruction[]): CubeState => {
-  const state = new Map<string, boolean>();
-  instructions.filter(isValid).forEach((instruction) => {
-    for (let x = instruction.start.x; x <= instruction.end.x; ++x) {
-      for (let y = instruction.start.y; y <= instruction.end.y; ++y) {
-        for (let z = instruction.start.z; z <= instruction.end.z; ++z) {
-          state.set(toKey(x, y, z), instruction.state);
-        }
-      }
-    }
-  });
-  return state;
+const intersectSegs = (
+  [aLow, aHigh]: Range,
+  [bLow, bHigh]: Range
+): Range | undefined => {
+  if (aHigh < bLow || bHigh < aLow) {
+    return;
+  }
+  return [Math.max(aLow, bLow), Math.min(aHigh, bHigh)];
 };
 
-export const countOnCubes = (state: CubeState) =>
-  [...state.values()].reduce((sum, value) => (value ? sum + 1 : sum), 0);
+const intersect = (a: Cuboid, b: Cuboid) => {
+  const common = {
+    x: intersectSegs(a.x, b.x),
+    y: intersectSegs(a.y, b.y),
+    z: intersectSegs(a.z, b.z),
+  };
+  if (common.x && common.y && common.z) {
+    return common as Cuboid;
+  }
+};
+
+const diffSegs = ([aLow, aHigh]: Range, [bLow, bHigh]: Range) => {
+  const segs = [];
+  if (aLow < bLow) {
+    segs.push([aLow, bLow - 1]);
+  }
+  if (bHigh < aHigh) {
+    segs.push([bHigh + 1, aHigh]);
+  }
+  return segs;
+};
+
+const difference = (a: Cuboid, b: Cuboid): Cuboid[] => {
+  let xsegs = diffSegs(a.x, b.x);
+  xsegs = [xsegs[0], b.x, ...xsegs.slice(1)];
+  let ysegs = diffSegs(a.y, b.y);
+  ysegs = [ysegs[0], b.y, ...ysegs.slice(1)];
+  let zsegs = diffSegs(a.z, b.z);
+  zsegs = [zsegs[0], b.z, ...zsegs.slice(1)];
+
+  const result: Cuboid[] = [];
+  for (let x = 0; x < xsegs.length; x++) {
+    for (let y = 0; y < ysegs.length; y++) {
+      for (let z = 0; z < zsegs.length; z++) {
+        if (x === 1 && y === 1 && z === 1) {
+          continue;
+        }
+        const cuboid: Cuboid = {
+          x: xsegs[x] as Range,
+          y: ysegs[y] as Range,
+          z: zsegs[z] as Range,
+        };
+        if (!cuboid.x || !cuboid.y || !cuboid.z) {
+          continue;
+        }
+        result.push(cuboid);
+      }
+    }
+  }
+  return result;
+};
+
+export const applyInstructions = (
+  instructions: Instruction[],
+  skipLarge = true
+): Core => {
+  let core: Core = [];
+  for (const instruction of instructions) {
+    const newCore = [];
+    if (skipLarge && !isLarge(instruction)) {
+      continue;
+    }
+    for (const A of core) {
+      const common = intersect(A, instruction.cuboid);
+      if (common) {
+        newCore.push(...difference(A, common));
+      } else {
+        newCore.push(A);
+      }
+    }
+
+    if (instruction.state) {
+      newCore.push(instruction.cuboid);
+    }
+    core = newCore;
+  }
+  return core;
+};
+
+export const countCubes = (core: Core) =>
+  core.reduce(
+    (count, { x: [xlow, xhigh], y: [ylow, yhigh], z: [zlow, zhigh] }) =>
+      count + (xhigh - xlow + 1) * (yhigh - ylow + 1) * (zhigh - zlow + 1),
+    0
+  );
 
 const day22 = () => {
   const instructions = readInstructions();
   const state = applyInstructions(instructions);
-  return countOnCubes(state);
+  return countCubes(state);
+};
+
+export const day22PartTwo = () => {
+  const instructions = readInstructions();
+  const skipLarge = false;
+  const state = applyInstructions(instructions, skipLarge);
+  return countCubes(state);
 };
 
 export default day22;
