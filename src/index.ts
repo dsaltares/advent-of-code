@@ -22,9 +22,10 @@ import day19, { day19PartTwo } from './2021/day19';
 import day20, { day20PartTwo } from './2021/day20';
 import day21, { day21PartTwo } from './2021/day21';
 import day22, { day22PartTwo } from './2021/day22';
+import day25 from './2021/day25';
 
 type Day = {
-  partOne: () => unknown;
+  partOne?: () => unknown;
   partTwo?: () => unknown;
 };
 
@@ -120,6 +121,11 @@ const solutions: Solutions = {
       partOne: day22,
       partTwo: day22PartTwo,
     },
+    {},
+    {},
+    {
+      partOne: day25,
+    },
   ],
 };
 
@@ -163,7 +169,9 @@ const main = () => {
         }
 
         console.log('🌟 day:', dayIndex + 1);
-        console.log('  - part 1:', day.partOne());
+        if (day.partOne) {
+          console.log('  - part 1:', day.partOne());
+        }
         if (day.partTwo) {
           console.log('  - part 2:', day.partTwo());
         }
