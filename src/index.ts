@@ -23,6 +23,8 @@ import day20, { day20PartTwo } from './2021/day20';
 import day21, { day21PartTwo } from './2021/day21';
 import day22, { day22PartTwo } from './2021/day22';
 import day25 from './2021/day25';
+import day23, { day23PartTwo } from './2021/day23';
+import day24, { day24PartTwo } from './2021/day24';
 
 type Day = {
   partOne?: () => unknown;
@@ -121,8 +123,14 @@ const solutions: Solutions = {
       partOne: day22,
       partTwo: day22PartTwo,
     },
-    {},
-    {},
+    {
+      partOne: day23,
+      partTwo: day23PartTwo,
+    },
+    {
+      partOne: day24,
+      partTwo: day24PartTwo,
+    },
     {
       partOne: day25,
     },
