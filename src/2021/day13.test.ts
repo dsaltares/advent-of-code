@@ -3,7 +3,6 @@ import {
   countDots,
   applyFold,
   applyAllFolds,
-  dotsToDisplay,
 } from './day13';
 
 const data = `
