@@ -1,14 +1,16 @@
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import year2021 from './2021';
+import year2022 from './2022';
 import { Solutions } from './types';
 
 const solutions: Solutions = {
   2021: year2021,
+  2022: year2022,
 };
 
-const main = () => {
-  const argv = yargs(hideBin(process.argv))
+const main = async () => {
+  const argv = await yargs(hideBin(process.argv))
     .scriptName('advent-of-code')
     .usage('Usage: $0 -y num -d num')
     .example(
