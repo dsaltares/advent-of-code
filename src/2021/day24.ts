@@ -118,5 +118,3 @@ export const day24PartTwo = () => {
 };
 
 export default day24;
-
-console.log('Bounds: ', getBounds(readData()));
