@@ -46,7 +46,7 @@ export const day02PartOne = () => {
   return calculateScore(rounds);
 };
 
-export const day02ParTwo = () => {
+export const day02PartTwo = () => {
   const rounds = readRounds();
   return calculateCorrectScore(rounds);
 };
