@@ -20,7 +20,7 @@ describe('day04PartOne', () => {
 });
 
 describe('day04PartTwo', () => {
-  it('counts pasrtially overlapping ranges', () => {
+  it('counts partially overlapping ranges', () => {
     const ranges = parseRanges(input);
     const count = countPartiallyOverlapping(ranges);
     expect(count).toEqual(4);
