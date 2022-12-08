@@ -6,6 +6,7 @@ import { day04PartOne, day04PartTwo } from './day04';
 import { day05PartOne, day05PartTwo } from './day05';
 import { day06PartOne, day06PartTwo } from './day06';
 import { day07PartOne, day07PartTwo } from './day07';
+import { day08PartOne, day08PartTwo } from './day08';
 
 const year: Year = [
   {
@@ -35,6 +36,10 @@ const year: Year = [
   {
     partOne: day07PartOne,
     partTwo: day07PartTwo,
+  },
+  {
+    partOne: day08PartOne,
+    partTwo: day08PartTwo,
   },
 ];
 
