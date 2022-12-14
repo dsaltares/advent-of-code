@@ -12,6 +12,7 @@ import { day10PartOne, day10PartTwo } from './day10';
 import { day11PartOne, day11PartTwo } from './day11';
 import { day12PartOne, day12PartTwo } from './day12';
 import { day13PartOne, day13PartTwo } from './day13';
+import { day14PartOne, day14PartTwo } from './day14';
 
 const year: Year = [
   {
@@ -65,6 +66,10 @@ const year: Year = [
   {
     partOne: day13PartOne,
     partTwo: day13PartTwo,
+  },
+  {
+    partOne: day14PartOne,
+    partTwo: day14PartTwo,
   },
 ];
 
