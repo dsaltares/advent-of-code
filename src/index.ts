@@ -3,12 +3,14 @@ import { hideBin } from 'yargs/helpers';
 import year2015 from './2015';
 import year2021 from './2021';
 import year2022 from './2022';
+import year2023 from './2023';
 import { Solutions } from './types';
 
 const solutions: Solutions = {
   2015: year2015,
   2021: year2021,
   2022: year2022,
+  2023: year2023,
 };
 
 const main = async () => {
