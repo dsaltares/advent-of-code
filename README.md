@@ -6,7 +6,7 @@ All answers are written in Typescript and code legibility has been prioritised o
 
 ### 🎄 Instructions
 
-Make sure you're using the right node version. 14 is recommended but you can just:
+Make sure you're using the right node version:
 
 ```
 nvm use

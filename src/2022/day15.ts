@@ -32,7 +32,7 @@ export const getTuningFrequency = (sensors: Sensor[], bound: number) => {
   for (let y = 0; y <= bound; y++) {
     const ranges = mergeRanges(getNonBeaconRanges(sensors, y));
     if (ranges.length === 2) {
-      const [_, endX] = ranges[0];
+      const endX = ranges[0][1];
       return (endX + 1) * 4000000 + y;
     }
   }
