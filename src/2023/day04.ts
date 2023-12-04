@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 
 type Card = {
-  number: number;
   winners: Set<number>;
   hand: number[];
 };
@@ -24,13 +23,12 @@ export const parseCards = (input: string): Card[] =>
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => !!line)
-    .map((line, index) => {
+    .map((line) => {
       const numbers = line.replace(/Card\s+[0-9]+:\s+/, '');
       const [winners, hand] = numbers
         .split(/\s+\|\s+/)
         .map((side) => side.split(/\s+/).map((num) => parseInt(num, 10)));
       return {
-        number: index,
         winners: new Set(winners),
         hand,
       };
@@ -44,11 +42,11 @@ export const sumCardPoints = (cards: Card[]) =>
 
 export const countProcessedCards = (cards: Card[]) => {
   const counts = Array.from(Array(cards.length)).fill(1);
-  cards.forEach((card) => {
+  cards.forEach((card, cardIdx) => {
     const numMatching = countMatching(card);
     if (numMatching > 0) {
-      for (let i = card.number + 1; i < card.number + numMatching + 1; i++) {
-        counts[i] += counts[card.number];
+      for (let i = cardIdx + 1; i < cardIdx + numMatching + 1; i++) {
+        counts[i] += counts[cardIdx];
       }
     }
   });
