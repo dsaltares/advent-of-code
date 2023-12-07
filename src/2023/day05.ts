@@ -82,7 +82,34 @@ export const getLowestLocationNumberForSeedsPartTwo = (data: SeedData) => {
     sortRangeMap(map);
 
     ranges.forEach((range) => {
-      map.forEach((mapEntry) => {});
+      let { start: id, length } = range;
+      while (length > 0) {
+        const entry = findMapEntry(id, map);
+        // The range is not mapped at all
+        if (!entry) {
+          nextRanges.push({ start: id, length });
+          break;
+        }
+
+        // The range is fully mapped
+        if (id >= entry.source && id + length <= entry.source + entry.length) {
+          nextRanges.push({
+            start: entry.target + id - entry.source,
+            length,
+          });
+          break;
+        }
+
+        // The range is partially mapped
+        // We need to grab the mapped portion and continue
+        const mappedLength = entry.source + entry.length - id;
+        nextRanges.push({
+          start: entry.target,
+          length: mappedLength,
+        });
+        id += mappedLength;
+        length -= mappedLength;
+      }
     });
 
     ranges = sortRanges(nextRanges);
@@ -103,6 +130,3 @@ const findMapEntry = (id: number, map: RangeMapEntry[]) =>
 
 const matchesMapEntry = (id: number, entry: RangeMapEntry) =>
   id >= entry.source && id < entry.source + entry.length;
-
-const applyMaps = (id: number, maps: RangeMapEntry[][]) =>
-  maps.reduce((acc, map) => mapId(acc, map), id);

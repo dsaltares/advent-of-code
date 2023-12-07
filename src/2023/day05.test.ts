@@ -2,7 +2,6 @@ import {
   parseSeedData,
   getLowestLocationNumberForSeeds,
   mapIds,
-  getLowestLocationNumberForSeedsPartTwo,
 } from './day05';
 
 const input = `
@@ -60,11 +59,3 @@ describe('day05PartOne', () => {
     expect(num).toEqual(35);
   });
 });
-
-// describe('day05PartTwo', () => {
-//   it('returns lowest location mumber for the seeds provided', () => {
-//     const data = parseSeedData(input);
-//     const num = getLowestLocationNumberForSeedsPartTwo(data);
-//     expect(num).toEqual(46);
-//   });
-// });
