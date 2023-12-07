@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 type RangeMapEntry = {
   source: number;
   target: number;
-  range: number;
+  length: number;
 };
 
 type SeedData = {
@@ -41,10 +41,10 @@ const parseRangeMap = (input: string): RangeMapEntry[] =>
     .map((line) => line.trim())
     .filter((line) => !!line)
     .map((line) => {
-      const [target, source, range] = line
+      const [target, source, length] = line
         .split(' ')
         .map((num) => parseInt(num, 10));
-      return { source, target, range };
+      return { source, target, length };
     });
 
 export const getLowestLocationNumberForSeeds = (data: SeedData) => {
@@ -60,48 +60,49 @@ export const mapIds = (ids: number[], map: RangeMapEntry[]) =>
 
 const mapId = (id: number, map: RangeMapEntry[]) => {
   const entry = map.find(
-    (entry) => id >= entry.source && id < entry.source + entry.range
+    (entry) => id >= entry.source && id < entry.source + entry.length
   );
   return entry ? entry.target + id - entry.source : id;
 };
 
-export const getLowestLocationNumberForSeedsPartTwo = (data: SeedData) => {
-  let minLocation = Number.MAX_SAFE_INTEGER;
-
-  const seeds = data.maps[0]
-    .sort((a, b) => a.source - b.source)
-    .map((x) => ({
-      start: x.source,
-      end: x.source + x.range,
-      startLocation: applyMaps(x.source, data.maps),
-      endLocation: applyMaps(x.source + x.range, data.maps),
-    }));
-
-  for (let i = 0; i < data.seeds.length; i += 2) {
-    const start = data.seeds[i];
-    const end = start + data.seeds[i + 1] - 1;
-    let location = Number.MAX_SAFE_INTEGER;
-
-    for (let j = 0; j < seeds.length; j++) {
-      const overlap =
-        Math.min(end, seeds[j].end) - Math.max(start, seeds[j].start);
-      if (overlap >= 0) {
-        const overLapStart = start >= seeds[j].start ? start : seeds[j].start;
-        const overLapEnd = end <= seeds[j].end ? end : seeds[j].end;
-
-        for (let k = overLapStart; k <= overLapEnd; k++) {
-          location = applyMaps(k, data.maps);
-          if (location < minLocation) {
-            minLocation = location;
-          }
-        }
-
-        break;
-      }
-    }
-  }
-  return minLocation;
+type Range = {
+  start: number;
+  length: number;
 };
+
+export const getLowestLocationNumberForSeedsPartTwo = (data: SeedData) => {
+  let ranges: Range[] = [];
+  for (let idx = 0; idx < data.seeds.length - 1; idx += 2) {
+    ranges.push({ start: data.seeds[idx], length: data.seeds[idx + 1] });
+  }
+  sortRanges(ranges);
+
+  data.maps.forEach((map) => {
+    const nextRanges: Range[] = [];
+    sortRangeMap(map);
+
+    ranges.forEach((range) => {
+      map.forEach((mapEntry) => {});
+    });
+
+    ranges = sortRanges(nextRanges);
+  });
+
+  sortRanges(ranges);
+  return ranges[0].start;
+};
+
+const sortRanges = (ranges: Range[]) =>
+  ranges.sort((a, b) => a.start - b.start);
+
+const sortRangeMap = (map: RangeMapEntry[]) =>
+  map.sort((a, b) => a.source - b.source);
+
+const findMapEntry = (id: number, map: RangeMapEntry[]) =>
+  map.find((entry) => matchesMapEntry(id, entry));
+
+const matchesMapEntry = (id: number, entry: RangeMapEntry) =>
+  id >= entry.source && id < entry.source + entry.length;
 
 const applyMaps = (id: number, maps: RangeMapEntry[][]) =>
   maps.reduce((acc, map) => mapId(acc, map), id);

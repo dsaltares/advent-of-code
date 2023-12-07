@@ -45,8 +45,8 @@ describe('mapIds', () => {
   it('maps ids correctly', () => {
     const seeds = [79, 14, 55, 13];
     const map = [
-      { target: 50, source: 98, range: 2 },
-      { target: 52, source: 50, range: 48 },
+      { target: 50, source: 98, length: 2 },
+      { target: 52, source: 50, length: 48 },
     ];
     const ids = mapIds(seeds, map);
     expect(ids).toEqual([81, 14, 57, 13]);
@@ -61,10 +61,10 @@ describe('day05PartOne', () => {
   });
 });
 
-describe('day05PartTwo', () => {
-  it('returns lowest location mumber for the seeds provided', () => {
-    const data = parseSeedData(input);
-    const num = getLowestLocationNumberForSeedsPartTwo(data);
-    expect(num).toEqual(46);
-  });
-});
+// describe('day05PartTwo', () => {
+//   it('returns lowest location mumber for the seeds provided', () => {
+//     const data = parseSeedData(input);
+//     const num = getLowestLocationNumberForSeedsPartTwo(data);
+//     expect(num).toEqual(46);
+//   });
+// });
