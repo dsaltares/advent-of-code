@@ -1,4 +1,8 @@
-import { getMinHeatLoss, parseMap } from './day17';
+import {
+  getMinHeatLossClumsyCrucible,
+  getMinHeatLossUltraCrucible,
+  parseMap,
+} from './day17';
 
 const input = `
 2413432311323
@@ -16,9 +20,17 @@ const input = `
 4322674655533`;
 
 describe('day17PartOne', () => {
-  it('returns the minimum heat loss for a crucible', () => {
+  it('returns the minimum heat loss for a clumsy crucible', () => {
     const map = parseMap(input);
-    const loss = getMinHeatLoss(map);
+    const loss = getMinHeatLossClumsyCrucible(map);
     expect(loss).toEqual(102);
+  });
+});
+
+describe('day17PartTwo', () => {
+  it('returns the minimum heat loss for an ultra crucible', () => {
+    const map = parseMap(input);
+    const loss = getMinHeatLossUltraCrucible(map);
+    expect(loss).toEqual(94);
   });
 });
