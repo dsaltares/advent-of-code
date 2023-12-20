@@ -18,6 +18,7 @@ import { day16PartOne, day16PartTwo } from './day16';
 import { day17PartOne, day17PartTwo } from './day17';
 import { day18PartOne, day18PartTwo } from './day18';
 import { day19PartOne, day19PartTwo } from './day19';
+import { day20PartOne, day20PartTwo } from './day20';
 
 const year: Year = [
   {
@@ -95,6 +96,10 @@ const year: Year = [
   {
     partOne: day19PartOne,
     partTwo: day19PartTwo,
+  },
+  {
+    partOne: day20PartOne,
+    partTwo: day20PartTwo,
   },
 ];
 
