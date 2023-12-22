@@ -24,7 +24,8 @@ describe('day21PartOne', () => {
     'returns the number of visited plots after $input steps',
     ({ steps, expected }) => {
       const map = parseMap(input);
-      const visited = getVisitedPlotsAfterSteps(map, steps);
+      const infinite = false;
+      const visited = getVisitedPlotsAfterSteps(map, steps, infinite);
       expect(visited).toEqual(expected);
     }
   );

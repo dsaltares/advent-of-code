@@ -5,7 +5,8 @@ export const day21PartOne = () => {
 };
 
 export const day21PartTwo = () => {
-  return 0;
+  const map = readMap();
+  return getVisitedPlotsAfterManyStepsInfiniteMap(map);
 };
 
 const readMap = () => parseMap(readFileSync('./data/2023/day21.txt', 'utf-8'));
@@ -18,33 +19,56 @@ export const parseMap = (input: string) =>
     .map((line) => line.split(''));
 
 export const getVisitedPlotsAfter64Steps = (map: Map) =>
-  getVisitedPlotsAfterSteps(map, 64);
+  getVisitedPlotsAfterSteps(map, 64, false);
 
-export const getVisitedPlotsAfterSteps = (map: Map, steps: number) => {
+export const getVisitedPlotsAfterManyStepsInfiniteMap = (map: Map) => {
+  // https://github.com/MarianBe/AdventOfCode/blob/main/src/2023/21.ts#L91
+  // The pattern is starting_pos + map_width * i
+  // https://www.dcode.fr/newton-interpolating-polynomial
+  const start = getStart(map);
+  const width = map[0].length;
+  // for (let i = 0; i < 3; i++) {
+  //   const infinite = true;
+  //   const visited = getVisitedPlotsAfterSteps(
+  //     map,
+  //     start.x + width * i,
+  //     infinite
+  //   );
+  //   console.log('i:', i, 'visited:', visited);
+  // }
+  const steps = 26501365;
+  const x = (steps - start.x) / width;
+  return (14275 * Math.pow(x, 2)) / 2 + (28629 * x) / 2 + 3606;
+};
+
+export const getVisitedPlotsAfterSteps = (
+  map: Map,
+  steps: number,
+  infinite: boolean
+) => {
+  const final = new Set<string>();
+  const queue = new Set<string>();
   const start = {
     position: getStart(map),
     steps: 0,
   };
-  const queue: Node[] = [start];
-  const seen = new Set<string>();
-  const processed: Node[] = [];
+  queue.add(getKey(start));
 
-  while (queue.length > 0) {
-    const top = queue.shift()!;
-    const topKey = getKey(top);
-    if (seen.has(topKey)) {
-      continue;
+  while (queue.size > 0) {
+    const nodeKey = queue.values().next().value;
+    const node = fromKey(nodeKey);
+    queue.delete(nodeKey);
+
+    if (node.steps === steps) {
+      final.add(nodeKey);
     }
-    seen.add(getKey(top));
-    processed.push(top);
-    queue.push(...getAdjacent(top, map, steps));
+
+    getAdjacent(node, map, steps, infinite).forEach((next) =>
+      queue.add(getKey(next))
+    );
   }
 
-  const visited = new Set(
-    processed.filter((node) => node.steps === steps).map(getKey)
-  );
-
-  return visited.size;
+  return final.size;
 };
 
 const getStart = (map: Map): Position => {
@@ -60,7 +84,12 @@ const getStart = (map: Map): Position => {
   throw new Error('Start not found');
 };
 
-const getAdjacent = (node: Node, map: Map, steps: number) => {
+const getAdjacent = (
+  node: Node,
+  map: Map,
+  steps: number,
+  infinite: boolean
+) => {
   const height = map.length;
   const width = map[0].length;
   return [
@@ -80,40 +109,30 @@ const getAdjacent = (node: Node, map: Map, steps: number) => {
       position: { x: node.position.x, y: node.position.y + 1 },
       steps: node.steps + 1,
     },
-  ].filter(
-    (candidate) =>
-      candidate.position.x >= 0 &&
-      candidate.position.x < width &&
-      candidate.position.y >= 0 &&
-      candidate.position.y < height &&
-      map[candidate.position.y][candidate.position.x] !== Rock &&
+  ].filter((candidate) => {
+    const x = infinite
+      ? candidate.position.x % width < 0
+        ? width + (candidate.position.x % width)
+        : candidate.position.x % width
+      : candidate.position.x;
+    const y = infinite
+      ? candidate.position.y % height < candidate.position.y % height
+        ? height + (candidate.position.y % height)
+        : candidate.position.y % height
+      : candidate.position.y;
+    return (
+      x >= 0 &&
+      x < width &&
+      y >= 0 &&
+      y < height &&
+      map[y][x] !== Rock &&
       candidate.steps <= steps
-  );
+    );
+  });
 };
 
-const getKey = (node: Node) =>
-  `${node.position.x},${node.position.y},${node.steps}`;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const drawMap = (map: Map, visited: Set<string>) => {
-  const height = map.length;
-  const width = map[0].length;
-  const lines: string[] = [];
-  for (let y = 0; y < height; y++) {
-    let line = '';
-    for (let x = 0; x < width; x++) {
-      const key = `${x},${y}`;
-      if (visited.has(key)) {
-        line += 'O';
-      } else {
-        line += map[y][x];
-      }
-    }
-    lines.push(line);
-  }
-
-  console.log('\n' + lines.join('\n'));
-};
+const getKey = (node: Node) => JSON.stringify(node);
+const fromKey = (key: string) => JSON.parse(key) as Node;
 
 const Start = 'S';
 const Rock = '#';
